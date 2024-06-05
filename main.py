@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from settings.config import *
-from services import msgbox
+from gui_components.widgets import msgbox
 import os
 
 if __name__ == "__main__":
