@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from settings.config import *
+from services import msgbox
 import os
 
 if __name__ == "__main__":
@@ -13,5 +14,8 @@ if __name__ == "__main__":
 
     root.tk.call("source", theme_path)
     style.theme_use("forest-light")
+
+    # Bind the on_closing function to the window close event
+    root.protocol("WM_DELETE_WINDOW", lambda:msgbox.on_exit(root))
     
     root.mainloop()
