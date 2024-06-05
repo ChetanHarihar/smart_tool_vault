@@ -1,0 +1,6 @@
+mfrc522==0.0.7
+openpyxl==3.1.2
+paho-mqtt==1.5.1
+pillow==10.3.0
+RPi.GPIO==0.7.1
+spidev==3.6
