@@ -1,3 +1,4 @@
 # Ignore __pycache__ in all directories
 __pycache__/
 **/__pycache__/
+smartvault.db
