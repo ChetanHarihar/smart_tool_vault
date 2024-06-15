@@ -3,8 +3,8 @@ from PIL import Image, ImageTk
 
 class RoleButton(tk.Button):
     # Load and resize images for admin and employee roles
-    emp = Image.open('/home/das01/Python/smart_tool_vault/assets/employee.png').resize((120, 120))
-    admin = Image.open('/home/das01/Python/smart_tool_vault/assets/admin.png').resize((120, 120))
+    emp = Image.open('/home/pi/Python/smart_tool_vault/assets/employee.png').resize((120, 120))
+    admin = Image.open('/home/pi/Python/smart_tool_vault/assets/admin.png').resize((120, 120))
 
     def __init__(self, master=None, role=None, command=None, **kwargs):
         super().__init__(master, **kwargs)
