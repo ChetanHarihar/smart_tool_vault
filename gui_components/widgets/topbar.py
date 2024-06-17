@@ -5,7 +5,7 @@ import time
 class TopBar(tk.Frame):
     def __init__(self, master=None, **kwargs):
         super().__init__(master, **kwargs)
-        self.config(bg="white", width=800, height=50, borderwidth=2, relief="groove")
+        self.config(bg="white", width=1024, height=50, borderwidth=2, relief="groove")
         self.pack_propagate(False)
         self.init_ui()
     
