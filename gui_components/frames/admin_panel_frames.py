@@ -275,7 +275,7 @@ class ItemPlacementManagement(tk.Frame):
 class TroubleShooting(tk.Frame):
     def __init__(self, master=None, **kwargs):
         super().__init__(master, **kwargs)
-        self.config(bg="#E8E9EB", width=600, height=430)
+        self.config(bg="#E8E9EB", width=824, height=526)
         self.pack_propagate(False)
         self.init_ui()
 

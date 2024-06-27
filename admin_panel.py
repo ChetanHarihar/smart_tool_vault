@@ -372,7 +372,7 @@ class AdminPanel(tk.Frame):
 
         # Actaute page
         self.send_message_label = tk.Label(self.ts_frame.actuate, text="Send Message: ")
-        self.send_message_label.pack()
+        self.send_message_label.pack(pady=(10,10))
 
         self.dropdown_contatiner = tk.Frame(self.ts_frame.actuate)
         self.dropdown_contatiner.pack()
@@ -388,7 +388,7 @@ class AdminPanel(tk.Frame):
         self.rack_label.pack(side=tk.LEFT)
 
         self.rack_dropdown2 = ttk.Combobox(self.dropdown_contatiner, textvariable=self.rack2, values=self.racks)
-        self.rack_dropdown2.pack(side=tk.LEFT)
+        self.rack_dropdown2.pack(side=tk.LEFT, padx=(0, 15))
 
         # create dropdown menu to select row
         # Create a variable to store the selected option
@@ -400,7 +400,7 @@ class AdminPanel(tk.Frame):
         self.row_label.pack(side=tk.LEFT)
 
         self.row_dropdown2 = ttk.Combobox(self.dropdown_contatiner, textvariable=self.row2, values=self.rows, width=5)
-        self.row_dropdown2.pack(side=tk.LEFT)
+        self.row_dropdown2.pack(side=tk.LEFT, padx=(0, 15))
 
         # create dropdown menu to select column
         # Create a variable to store the selected option
@@ -412,7 +412,7 @@ class AdminPanel(tk.Frame):
         self.col_label.pack(side=tk.LEFT)
 
         self.col_dropdown2 = ttk.Combobox(self.dropdown_contatiner, textvariable=self.col2, values=self.cols, width=5)
-        self.col_dropdown2.pack(side=tk.LEFT)
+        self.col_dropdown2.pack(side=tk.LEFT, padx=(0, 15))
 
         # create dropdown menu to select action
         # Create a variable to store the selected option
@@ -424,10 +424,10 @@ class AdminPanel(tk.Frame):
         self.action_label.pack(side=tk.LEFT)
 
         self.action_dropdown = ttk.Combobox(self.dropdown_contatiner, textvariable=self.action, values=['OPEN','CLOSE'], width=5)
-        self.action_dropdown.pack(side=tk.LEFT)
+        self.action_dropdown.pack(side=tk.LEFT, padx=(0, 15))
 
         self.send_message_btn = tk.Button(self.ts_frame.actuate, text="Send", command=self.send_msg)
-        self.send_message_btn.pack()
+        self.send_message_btn.pack(pady=(20,10))
 
 
     def switch_frame(self, frame):
