@@ -23,6 +23,7 @@ class AdminPanel(tk.Frame):
         self.user_name = None
         self.category_data = database.fetch_categories()
         self.item_data = database.fetch_all_items(self.category_data)
+        self.machine_data = database.get_all_machines()
         self.rack_details = database.get_all_racks()
         self.racks = [name for id, name in database.get_all_racks()]
         self.rows = ['A', 'B', 'C', 'D', 'E']
@@ -164,6 +165,31 @@ class AdminPanel(tk.Frame):
         # category remove button
         self.item_remove_btn = tk.Button(self.inv_man_frame.item_view_frame, text="Remove", command=self.remove_item)
         self.item_remove_btn.pack(pady=(10,0))
+
+        self.machine_treeview_frame = tk.Frame(self.inv_man_frame.mac_view_frame)
+        self.machine_treeview_frame.pack(pady=(0, 5))
+
+        self.mac_treeview = TreeView(self.machine_treeview_frame, height=14)
+
+        # Create columns
+        self.mac_treeview["columns"] = ("id", "Sl.no", "Machine Name", "Machine Code")
+        self.mac_treeview.column("#0", width=0, stretch=tk.NO)  # Hide the cart_tree column
+        self.mac_treeview.column("id", width=0, stretch=tk.NO)  
+        self.mac_treeview.column("Sl.no", width=40, anchor=tk.CENTER)
+        self.mac_treeview.column("Machine Name", width=200, anchor=tk.CENTER)
+        self.mac_treeview.column("Machine Code", width=150, anchor=tk.CENTER)
+
+        # Create headings
+        self.mac_treeview.heading("id", text="id")
+        self.mac_treeview.heading("Sl.no", text="Sl.no")
+        self.mac_treeview.heading("Machine Name", text="Machine Name", anchor=tk.CENTER)
+        self.mac_treeview.heading("Machine Code", text="Machine Code", anchor=tk.CENTER)
+
+        self.show_machines()
+
+        # category remove button
+        self.mac_remove_btn = tk.Button(self.inv_man_frame.mac_view_frame, text="Remove", command=self.remove_mac)
+        self.mac_remove_btn.pack(pady=(10,0))
 
         # Item stock view
         # create dropdown menu to select category
@@ -508,7 +534,17 @@ class AdminPanel(tk.Frame):
         self.show_stock()
 
     def add_mac(self):
-        pass
+        mac_name = self.inv_man_frame.mac_name_entry.get().strip().upper()
+        mac_code = self.inv_man_frame.mac_code_entry.get().strip().upper()
+        if mac_name is not None and mac_code is not None:
+            success, message = database.add_machine(mac_name, mac_code)
+            if success:
+                msgbox.show_success_message_box(message)
+                self.item_data = database.fetch_all_items(self.category_data)
+            else:
+                msgbox.show_error_message_box("Error", message)
+        # run show machines function again and fetch all the mac data
+        self.machine_data = database.get_all_machines()
 
     def show_categories(self):
         self.delete_treeview_items(self.cat_treeview)
@@ -758,6 +794,30 @@ class AdminPanel(tk.Frame):
                 pass
         except Exception as e:
             print(e)
+
+    def show_machines(self):
+        self.delete_treeview_items(self.mac_treeview)
+        # insert all rack data in the rack Treeview
+        for i, item in enumerate(self.machine_data, start=1):
+            if i % 2 == 0:
+                self.mac_treeview.insert("", "end", values=(f"{item[0]}", f"{i}", f"{item[1]}", f"{item[2]}"), tags=('evenrow',))
+            else:
+                self.mac_treeview.insert("", "end", values=(f"{item[0]}", f"{i}", f"{item[1]}", f"{item[2]}"), tags=('oddrow',))
+
+    def remove_mac(self):
+        # remove the selected item and update the treeview
+        selected_item = self.mac_treeview.focus()
+        if selected_item:
+            item_values = self.item_treeview.item(selected_item, 'values')
+            # get the id of the item
+            item_id = item_values[0]
+            if msgbox.confirm_remove_item():
+                database.delete_machine(item_id)
+                self.machine_data = database.get_all_machines()
+            else:
+                pass
+        # show the updated list
+        self.show_machines()
 
     def send_msg(self):
         rack = self.rack_dropdown2.get()
