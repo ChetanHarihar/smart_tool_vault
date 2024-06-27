@@ -112,13 +112,13 @@ class AdminPanel(tk.Frame):
         self.cat_treeview_frame = tk.Frame(self.inv_man_frame.cat_view_frame)
         self.cat_treeview_frame.pack()
 
-        self.cat_treeview = TreeView(self.cat_treeview_frame, height=9)
+        self.cat_treeview = TreeView(self.cat_treeview_frame, height=14)
 
         # Create columns
         self.cat_treeview["columns"] = ("Sl.no", "Categories")
         self.cat_treeview.column("#0", width=0, stretch=tk.NO)  # Hide the cart_tree column
         self.cat_treeview.column("Sl.no", width=40, anchor=tk.CENTER)
-        self.cat_treeview.column("Categories", width=200, anchor=tk.CENTER)
+        self.cat_treeview.column("Categories", width=250, anchor=tk.CENTER)
 
         # Create headings
         self.cat_treeview.heading("Sl.no", text="Sl.no")
@@ -138,21 +138,21 @@ class AdminPanel(tk.Frame):
 
         # Create the dropdown menu
         self.cat_dropdown = ttk.Combobox(self.inv_man_frame.item_view_frame, textvariable=self.var1, values=self.category_data)
-        self.cat_dropdown.pack()
+        self.cat_dropdown.pack(pady=(0, 5))
 
         self.cat_dropdown.bind("<<ComboboxSelected>>", self.show_items)
 
         self.item_treeview_frame = tk.Frame(self.inv_man_frame.item_view_frame)
-        self.item_treeview_frame.pack()
+        self.item_treeview_frame.pack(pady=(0, 5))
 
-        self.item_treeview = TreeView(self.item_treeview_frame, height=9)
+        self.item_treeview = TreeView(self.item_treeview_frame, height=12)
 
         # Create columns
         self.item_treeview["columns"] = ("id", "Sl.no", "Items")
         self.item_treeview.column("#0", width=0, stretch=tk.NO)  # Hide the cart_tree column
         self.item_treeview.column("id", width=0, stretch=tk.NO)  
         self.item_treeview.column("Sl.no", width=40, anchor=tk.CENTER)
-        self.item_treeview.column("Items", width=250, anchor=tk.CENTER)
+        self.item_treeview.column("Items", width=350, anchor=tk.CENTER)
 
         # Create headings
         self.item_treeview.heading("id", text="id")
@@ -182,15 +182,15 @@ class AdminPanel(tk.Frame):
         self.stock_treeview_frame = tk.Frame(self.inv_man_frame.stock_main_frame)
         self.stock_treeview_frame.pack(pady=(5,0))
 
-        self.stock_treeview = TreeView(self.stock_treeview_frame, height=8)
+        self.stock_treeview = TreeView(self.stock_treeview_frame, height=13)
 
         # Create columns
         self.stock_treeview["columns"] = ("id", "Sl.no", "Items", "Quantity")
         self.stock_treeview.column("#0", width=0, stretch=tk.NO)  # Hide the cart_tree column
         self.stock_treeview.column("id", width=0, stretch=tk.NO)  
         self.stock_treeview.column("Sl.no", width=40, anchor=tk.CENTER)
-        self.stock_treeview.column("Items", width=250, anchor=tk.CENTER)
-        self.stock_treeview.column("Quantity", width=50, anchor=tk.CENTER)
+        self.stock_treeview.column("Items", width=400, anchor=tk.CENTER)
+        self.stock_treeview.column("Quantity", width=100, anchor=tk.CENTER)
 
         # Create headings
         self.stock_treeview.heading("id", text="id")
@@ -209,15 +209,15 @@ class AdminPanel(tk.Frame):
         self.ip_item_treeview_frame = tk.Frame(self.ip_man_frame.ip_placement_label_frame)
         self.ip_item_treeview_frame.pack(pady=(5,0))
 
-        self.ip_item_treeview = TreeView(self.ip_item_treeview_frame, height=2)
+        self.ip_item_treeview = TreeView(self.ip_item_treeview_frame, height=4)
 
         # Create columns
         self.ip_item_treeview["columns"] = ("id", "Sl.no", "Category", "Items")
         self.ip_item_treeview.column("#0", width=0, stretch=tk.NO)  # Hide the cart_tree column
         self.ip_item_treeview.column("id", width=0, stretch=tk.NO)  
         self.ip_item_treeview.column("Sl.no", width=40, anchor=tk.CENTER)
-        self.ip_item_treeview.column("Category", width=150, anchor=tk.CENTER)
-        self.ip_item_treeview.column("Items", width=250, anchor=tk.CENTER)
+        self.ip_item_treeview.column("Category", width=200, anchor=tk.CENTER)
+        self.ip_item_treeview.column("Items", width=400, anchor=tk.CENTER)
 
         # Create headings
         self.ip_item_treeview.heading("id", text="id")
@@ -230,68 +230,77 @@ class AdminPanel(tk.Frame):
 
         self.show_ip_items()
 
-        self.ip_widget_frame = tk.Frame(self.ip_man_frame.ip_placement_label_frame)
-        self.ip_widget_frame.pack(pady=(10,0))
+        self.ip_widget_frame1 = tk.Frame(self.ip_man_frame.ip_placement_label_frame)
+        self.ip_widget_frame1.pack(pady=(10,0))
 
-        self.ip_item_label = tk.Label(self.ip_widget_frame, text="Item Name:")
+        self.ip_widget_frame2 = tk.Frame(self.ip_man_frame.ip_placement_label_frame)
+        self.ip_widget_frame2.pack(pady=(10,0))
+
+        self.ip_widget_frame3 = tk.Frame(self.ip_man_frame.ip_placement_label_frame)
+        self.ip_widget_frame3.pack(pady=(10,0))
+
+        self.ip_item_label = tk.Label(self.ip_widget_frame1, text="Item Name:")
         self.ip_item_label.grid(row=0, column=0)
 
-        self.ip_item_name = tk.Label(self.ip_widget_frame, text="", width=30, anchor='w')
+        self.ip_item_name = tk.Label(self.ip_widget_frame1, text="", width=30, anchor='w')
         self.ip_item_name.grid(row=0, column=1)
 
         # dropdown to select rack, row and column
 
         # create dropdown menu to select rack
         # Create a variable to store the selected option
-        self.rack = tk.StringVar(self.ip_widget_frame)
+        self.rack = tk.StringVar(self.ip_widget_frame2)
         self.rack.set(self.racks[0])  # Set the default option
 
         # Create the dropdown menu
-        self.rack_label = tk.Label(self.ip_widget_frame, text='Select Rack')
+        self.rack_label = tk.Label(self.ip_widget_frame2, text='Select Rack')
         self.rack_label.grid(row=1, column=0)
 
-        self.rack_dropdown = ttk.Combobox(self.ip_widget_frame, textvariable=self.rack, values=self.racks)
+        self.rack_dropdown = ttk.Combobox(self.ip_widget_frame2, textvariable=self.rack, values=self.racks)
         self.rack_dropdown.grid(row=1, column=1, sticky='w')
 
         # create dropdown menu to select row
         # Create a variable to store the selected option
-        self.row = tk.StringVar(self.ip_widget_frame)
+        self.row = tk.StringVar(self.ip_widget_frame3)
         self.row.set(self.rows[0])  # Set the default option
 
         # Create the dropdown menu
-        self.row_label = tk.Label(self.ip_widget_frame, text='Select Row: ')
+        self.row_label = tk.Label(self.ip_widget_frame3, text='Select Row: ')
         self.row_label.grid(row=2, column=0)
 
-        self.row_dropdown = ttk.Combobox(self.ip_widget_frame, textvariable=self.row, values=self.rows, width=5)
-        self.row_dropdown.grid(row=2, column=1, sticky='w')
+        self.row_dropdown = ttk.Combobox(self.ip_widget_frame3, textvariable=self.row, values=self.rows, width=5)
+        self.row_dropdown.grid(row=2, column=1)
+
+        self.emp_label = tk.Label(self.ip_widget_frame3, text='       ')
+        self.emp_label.grid(row=2, column=2)
 
         # create dropdown menu to select column
         # Create a variable to store the selected option
-        self.col = tk.StringVar(self.ip_widget_frame)
+        self.col = tk.StringVar(self.ip_widget_frame3)
         self.col.set(self.cols[0])  # Set the default option
 
         # Create the dropdown menu
-        self.col_label = tk.Label(self.ip_widget_frame, text='Select Column: ')
-        self.col_label.grid(row=3, column=0)
+        self.col_label = tk.Label(self.ip_widget_frame3, text='Select Column: ')
+        self.col_label.grid(row=2, column=3)
 
-        self.col_dropdown = ttk.Combobox(self.ip_widget_frame, textvariable=self.col, values=self.cols, width=5)
-        self.col_dropdown.grid(row=3, column=1, sticky='w')
+        self.col_dropdown = ttk.Combobox(self.ip_widget_frame3, textvariable=self.col, values=self.cols, width=5)
+        self.col_dropdown.grid(row=2, column=4)
 
-        self.place_btn = tk.Button(self.ip_widget_frame, text="Place", command=self.place_item)
-        self.place_btn.grid(row=0, column=3)
+        self.place_btn = tk.Button(self.ip_man_frame.ip_placement_label_frame, text="Place", command=self.place_item)
+        self.place_btn.pack(pady=(10,0))
 
         # view racks
         self.rack_treeview_frame = tk.Frame(self.ip_man_frame.rack_view_frame)
         self.rack_treeview_frame.pack()
 
-        self.rack_treeview = TreeView(self.rack_treeview_frame, height=9)
+        self.rack_treeview = TreeView(self.rack_treeview_frame, height=15)
 
         # Create columns
         self.rack_treeview["columns"] = ("Sl.no", "id", "Rack")
         self.rack_treeview.column("#0", width=0, stretch=tk.NO) 
         self.rack_treeview.column("Sl.no", width=50, anchor=tk.CENTER)
         self.rack_treeview.column("id", width=0, stretch=tk.NO)
-        self.rack_treeview.column("Rack", width=150, anchor=tk.CENTER)
+        self.rack_treeview.column("Rack", width=200, anchor=tk.CENTER)
 
         # Create headings
         self.rack_treeview.heading("Sl.no", text="Sl.no", anchor=tk.CENTER)
@@ -318,14 +327,14 @@ class AdminPanel(tk.Frame):
         self.item_placement_treeview_frame = tk.Frame(self.ip_man_frame.placement_view_frame)
         self.item_placement_treeview_frame.pack()
 
-        self.item_placement_treeview = TreeView(self.item_placement_treeview_frame, height=8)
+        self.item_placement_treeview = TreeView(self.item_placement_treeview_frame, height=13)
 
         # Create columns
         self.item_placement_treeview["columns"] = ("Sl.no", "Category", "Item", "Quantity", "rp.id", "Position", "ip.id")
         self.item_placement_treeview.column("#0", width=0, stretch=tk.NO)   
         self.item_placement_treeview.column("Sl.no", width=40, anchor=tk.CENTER)
-        self.item_placement_treeview.column("Category", width=100, anchor=tk.CENTER)
-        self.item_placement_treeview.column("Item", width=250, anchor=tk.CENTER)
+        self.item_placement_treeview.column("Category", width=150, anchor=tk.CENTER)
+        self.item_placement_treeview.column("Item", width=350, anchor=tk.CENTER)
         self.item_placement_treeview.column("Quantity", width=70, anchor=tk.CENTER)
         self.item_placement_treeview.column("rp.id", width=0, stretch=tk.NO)  
         self.item_placement_treeview.column("Position", width=70, anchor=tk.CENTER)
