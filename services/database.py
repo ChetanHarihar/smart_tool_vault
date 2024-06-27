@@ -652,13 +652,16 @@ def add_machine(name, code):
         ''', (name, code))
         
         conn.commit()
-        print("Machine added successfully.")
+        msg = "Machine added successfully."
+        return True, msg
     
     except sqlite3.IntegrityError as e:
         print(f"Integrity error occurred: {e}")
+        return False, f"Integrity error occurred: {e}"
     
     except sqlite3.Error as e:
         print(f"Database error occurred: {e}")
+        return False, f"Database error occurred: {e}"
     
     finally:
         if conn:
@@ -691,12 +694,15 @@ def delete_machine(machine_id):
         
         if cursor.rowcount == 0:
             print(f"No machine found with id {machine_id}")
+            return False, f"Machine with id {machine_id} not found."
         else:
             conn.commit()
             print("Machine deleted successfully.")
+            return True, f"Machine with id {machine_id} deleted."
     
     except sqlite3.Error as e:
         print(f"Database error occurred: {e}")
+        return False, f"Database error occurred: {e}"
     
     finally:
         if conn:
