@@ -132,11 +132,20 @@ class InventoryManagement(tk.Frame):
         self.machine_label_frame.pack_propagate(False)
         self.machine_label_frame.pack(pady=(15,0))
 
-        self.mac_label = tk.Label(self.machine_label_frame, text="Machine Name:")
-        self.mac_label.pack(side="left", padx=(5,5))
+        self.mac_widget_frame = tk.Frame(self.machine_label_frame)
+        self.mac_widget_frame.pack(side="left", padx=(5,5))
 
-        self.mac_entry = tk.Entry(self.machine_label_frame, width=25)
-        self.mac_entry.pack(side="left", padx=(5,5))
+        self.mac_name_label = tk.Label(self.mac_widget_frame, text="Machine Name:")
+        self.mac_name_label.grid(row=0,column=0,sticky='w')
+
+        self.mac_name_entry = tk.Entry(self.mac_widget_frame, width=25)
+        self.mac_name_entry.grid(row=0,column=1)
+
+        self.mac_code_label = tk.Label(self.mac_widget_frame, text="Machine Code:")
+        self.mac_code_label.grid(row=1,column=0,sticky='w')
+
+        self.mac_code_entry = tk.Entry(self.mac_widget_frame, width=25)
+        self.mac_code_entry.grid(row=1,column=1)
 
         self.mac_add_btn = tk.Button(self.machine_label_frame, text="Add", command=None)
         self.mac_add_btn.pack(side="left", padx=(5,5))
@@ -146,16 +155,16 @@ class InventoryManagement(tk.Frame):
         self.manage_main_frame.pack(fill="both", expand=True)
 
         self.manage_btns_frame = tk.Frame(self.manage_main_frame)
-        self.manage_btns_frame.pack()
+        self.manage_btns_frame.pack(pady=(10, 5))
 
         self.cat_view_btn = tk.Button(self.manage_btns_frame, text="View Categories", command=lambda: self.switch_view(self.cat_view_frame))
-        self.cat_view_btn.pack(side='left')
+        self.cat_view_btn.pack(side='left', padx=(2.5, 2.5))
 
         self.item_view_btn = tk.Button(self.manage_btns_frame, text="View Items", command=lambda: self.switch_view(self.item_view_frame))
-        self.item_view_btn.pack(side='left')
+        self.item_view_btn.pack(side='left', padx=(2.5, 2.5))
 
         self.mac_view_btn = tk.Button(self.manage_btns_frame, text="View Machines", command=lambda: self.switch_view(self.mac_view_frame))
-        self.mac_view_btn.pack(side='left')
+        self.mac_view_btn.pack(side='left', padx=(2.5, 2.5))
 
         self.manage_view_frame = tk.Frame(self.manage_main_frame)
         self.manage_view_frame.pack(pady=(10,10))
@@ -171,24 +180,24 @@ class InventoryManagement(tk.Frame):
         self.stock_main_frame.pack()
 
         # create label frames to restock items
-        self.restock_label_frame = tk.LabelFrame(self.stock_main_frame, text="Restock", width=590, height=70)
+        self.restock_label_frame = tk.LabelFrame(self.stock_main_frame, text="Restock", width=814, height=90)
         self.restock_label_frame.pack_propagate(False)
-        self.restock_label_frame.pack(side=tk.BOTTOM, pady=(5,0))
+        self.restock_label_frame.pack(side=tk.BOTTOM, pady=(10,0))
 
         self.restock_item_label = tk.Label(self.restock_label_frame, text="Item Name:")
         self.restock_item_label.pack(side="left", padx=(5,5))
 
-        self.restock_item_name = tk.Label(self.restock_label_frame, text="", width=30, anchor='w')
+        self.restock_item_name = tk.Label(self.restock_label_frame, text="", width=45, anchor='w')
         self.restock_item_name.pack(side="left", padx=(5,5))
 
         self.restock_quantity_label = tk.Label(self.restock_label_frame, text="Quantity")
         self.restock_quantity_label.pack(side="left", padx=(5,5))
 
-        self.restock_quantity_entry = tk.Entry(self.restock_label_frame, width=5)
+        self.restock_quantity_entry = tk.Entry(self.restock_label_frame, width=10)
         self.restock_quantity_entry.pack(side="left", padx=(5,5))
 
         self.restock_btn = tk.Button(self.restock_label_frame, text="Restock", command=None)
-        self.restock_btn.pack(side="left", padx=(5,5))
+        self.restock_btn.pack(side="left", padx=(20,5))
 
 
     def switch_view(self, view):
@@ -200,7 +209,7 @@ class InventoryManagement(tk.Frame):
 class ItemPlacementManagement(tk.Frame):
     def __init__(self, master=None, **kwargs):
         super().__init__(master, **kwargs)
-        self.config(bg="#E8E9EB", width=600, height=430)
+        self.config(bg="#E8E9EB", width=824, height=526)
         self.pack_propagate(False)
         self.init_ui()
 
@@ -219,7 +228,7 @@ class ItemPlacementManagement(tk.Frame):
         self.notebook.pack(fill="both", expand=True)
 
         # create label frames for adding racks and item placement details
-        self.rack_label_frame = tk.LabelFrame(self.add, text="Add Rack", width=590, height=70)
+        self.rack_label_frame = tk.LabelFrame(self.add, text="Add Rack", width=814, height=100)
         self.rack_label_frame.pack_propagate(False)
         self.rack_label_frame.pack(pady=(15,0))
 
@@ -232,7 +241,7 @@ class ItemPlacementManagement(tk.Frame):
         self.rack_add_btn = tk.Button(self.rack_label_frame, text="Add", command=None)
         self.rack_add_btn.pack(side="left", padx=(5,5))
 
-        self.ip_placement_label_frame = tk.LabelFrame(self.add, text="Item Placement", width=590, height=280)
+        self.ip_placement_label_frame = tk.LabelFrame(self.add, text="Item Placement", width=814, height=340)
         self.ip_placement_label_frame.pack_propagate(False)
         self.ip_placement_label_frame.pack(pady=(10,0))
 
