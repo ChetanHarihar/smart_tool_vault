@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import Toplevel
 import os
 from gui_components.widgets.treeview import TreeView
 from gui_components.widgets.topbar import TopBar
@@ -384,6 +385,13 @@ class EmployeePanel(tk.Frame):
                 self.terminate_btn.config(text="Session Terminated", state="disabled")
                 self.terminate_btn.config(state="disabled")  # Disable terminate button at end
                 self.session_button.config(state="disabled")  # Also disable start session button
+                subject = 'Rectock Alert'
+                message = ''
+                for item in self.min_stock_details:
+                    message += f'Restock {item[0]} only {item[1]} left\n'
+                print(message)
+                restock_email(EMAIL_SENDER, EMAIL_PASSWORD, EMAIL_RECEIVER, subject, message)
+                self.show_countdown(10)
         elif action == "terminate":
             if self.current_command:
                 topic, message = self.current_command
@@ -401,6 +409,30 @@ class EmployeePanel(tk.Frame):
 
     def update_datetime(self):
         self.top_bar.update_datetime()
+
+    def countdown(self, top, label, count):
+        # Change the text in the label
+        label['text'] = f"Please wait {count} seconds before closing the application"
+
+        if count > 0:
+            # Call countdown again after 1000ms (1s)
+            top.after(1000, self.countdown, top, label, count - 1)
+        else:
+            # When the countdown reaches zero, close the window
+            top.destroy()
+
+    def show_countdown(self, count):
+        # Create a custom top-level window
+        top = Toplevel()
+        top.title("Wait")
+        top.geometry("500x100")
+
+        # Create a label to display the countdown
+        label = tk.Label(top, font=('Helvetica', 14))
+        label.pack(pady=20)
+
+        # Start the countdown
+        self.countdown(top, label, count)
 
 
 # If this file is run directly for testing purposes
