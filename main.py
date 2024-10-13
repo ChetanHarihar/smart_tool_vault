@@ -1,5 +1,6 @@
 from settings.config import *
 from login_panel import LoginPanel
+from gui_components.widgets import msgbox
 
 if __name__ == "__main__":
     root = tk.Tk()
