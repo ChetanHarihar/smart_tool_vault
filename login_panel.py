@@ -1,5 +1,6 @@
 from settings.config import *
 from gui_components.widgets.login_message import *
+from services import database
 from employee_panel import EmployeePanel
 from admin_panel import AdminPanel
 
@@ -82,13 +83,14 @@ class LoginPanel(tk.Frame):
             scanned_ID = self.card_id.get()
             if scanned_ID:
                 # check the role and validate the scan
-                # database function here
-                scan_result = None
+                scan_result = database.check_scan_result(uid=scanned_ID, role=self.role, db_path=DATABASE_PATH)
                 # if scan_result:
-                if scanned_ID == "3830935731":
+                if scan_result:
+                    self.user_id = scan_result[0]
+                    self.username = scan_result[1]
                     if self.login_failed_window and self.login_failed_window.winfo_exists():
                         self.login_failed_window.destroy()
-                    self.login_success_window = LoginSuccess(master=self.root, username="Chetan")
+                    self.login_success_window = LoginSuccess(master=self.root, username=self.username)
                     print("Valid card")
                     self.scan = False
                     if self.role == 1:
