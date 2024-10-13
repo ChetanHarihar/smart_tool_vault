@@ -3,4 +3,4 @@ __pycache__/
 **/__pycache__/
 smartvault.db
 settings/config.py
-smart_tool_vault
+smart_tool_vault_venv
