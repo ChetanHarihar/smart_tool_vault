@@ -78,10 +78,10 @@ def get_category_id_by_name(category_name, db_path):
         cursor.close()
         conn.close()
 
-def fetch_all_items(categories):
+def fetch_all_items(categories, db_path):
     conn = None
     try:
-        conn = sqlite3.connect('/home/pi/Python/smart_tool_vault/smartvault.db')
+        conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
 
         all_items = {}
