@@ -5,6 +5,9 @@ def on_exit(root):
     if messagebox.askokcancel("Quit", "Do you want to exit the application?"):
         root.destroy()
 
+def invalid_quantity(max_quantity):
+    show_error_message_box(title="Invalid order quantity", message=f"Entered invalid quantity.\nCan order only upto {max_quantity}")
+
 def confirm_pickup():
     result = messagebox.askyesno("Confirm Pickup", "Are you sure you want to confirm the pickup?")
     # returns true if user presses Yes
