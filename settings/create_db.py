@@ -75,6 +75,7 @@ CREATE TABLE IF NOT EXISTS item_placement (
 );
 ''')
 
+
 # Creating trigger to prevent deletion of categories with existing items
 cursor.execute('''
 CREATE TRIGGER prevent_category_delete
@@ -112,6 +113,20 @@ BEGIN
     END;
 END;
 ''')
+
+# Creating the trigger to prevent deletion of items that are placed in rack positions
+cursor.execute('''
+CREATE TRIGGER prevent_item_delete
+BEFORE DELETE ON item
+FOR EACH ROW
+BEGIN
+    SELECT CASE
+        WHEN (SELECT COUNT(*) FROM item_placement WHERE item_id = OLD.id) > 0 THEN
+            RAISE(ABORT, 'Cannot delete item as it is placed in a rack.')
+    END;
+END;
+''')
+
 
 # Commit the transaction
 conn.commit()
