@@ -10,6 +10,11 @@ def confirm_pickup():
     # returns true if user presses Yes
     return result
 
+def confirm_remove_item_from_cart():
+    result = messagebox.askokcancel("Confirmation", "Are you sure you want to remove the Item?")
+    # returns true if user presses OK
+    return result
+
 def confirm_remove_user():
     result = messagebox.askokcancel("Confirmation", "Are you sure you want to remove the User?")
     # returns true if user presses OK
