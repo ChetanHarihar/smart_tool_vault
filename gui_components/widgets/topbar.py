@@ -10,12 +10,12 @@ class TopBar(tk.Frame):
     
     def init_ui(self):
         # place user label
-        self.user_label = tk.Label(self, text="User: ", font=('times new roman', 12), bg="white")
-        self.user_label.place(relx=0.03, rely=0.5, anchor="center")
+        self.user_info_label = tk.Label(self, text="User: ", font=('times new roman', 12, 'bold'), bg="white")
+        self.user_info_label.place(relx=0.05, rely=0.5, anchor="center")
 
         # place machine label
-        self.user_label = tk.Label(self, text="Machine: ", font=('times new roman', 12), bg="white")
-        self.user_label.place(relx=0.5, rely=0.5, anchor="center")
+        self.machine_info_label = tk.Label(self, text="Machine: ", font=('times new roman', 12, 'bold'), bg="white")
+        self.machine_info_label.place(relx=0.5, rely=0.5, anchor="center")
 
         # date_time frame
         self.date_time_frame = tk.Frame(self, bg="white")
