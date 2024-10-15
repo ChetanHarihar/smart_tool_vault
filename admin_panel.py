@@ -482,6 +482,9 @@ class AdminPanel(tk.Frame):
             msgbox.show_success_message_box(message)
             # show the updated list
             self.show_users()
+            self.user_man_frame.name_entry.delete(0, tk.END)
+            self.user_man_frame.uid_entry.delete(0, tk.END)
+            self.user_man_frame.role_var.set(1)
         else:
             msgbox.show_error_message_box("Error", message)
 
@@ -518,6 +521,7 @@ class AdminPanel(tk.Frame):
             self.stock_view_category_dropdown.config(textvariable=self.stock_view_var, values=self.category_data)
             # show the updated list
             self.show_categories()
+            self.inv_man_frame.cat_entry.delete(0, tk.END)
         else:
             msgbox.show_error_message_box("Error", message)
 
@@ -527,9 +531,13 @@ class AdminPanel(tk.Frame):
         if selected_item:
             item_values = self.category_treeview.item(selected_item, 'values')
             # get the category id
-            cat_id = database.get_category_id_by_name(item_values[1])
+            cat_id = database.get_category_id_by_name(item_values[1], db_path=DATABASE_PATH)
             if msgbox.confirm_remove_category():
-                database.delete_category_by_id(cat_id, db_path=DATABASE_PATH)
+                result = database.delete_category_by_id(cat_id, db_path=DATABASE_PATH)
+                # if Error the show error message
+                if not result[0]:
+                    msgbox.show_error_message_box(title="Error", message=result[1])
+                    return
                 self.category_data = database.fetch_categories(db_path=DATABASE_PATH)
                 self.item_view_category_dropdown.config(textvariable=self.item_view_var, values=self.category_data)
                 self.stock_view_category_dropdown.config(textvariable=self.stock_view_var, values=self.category_data)
@@ -563,6 +571,8 @@ class AdminPanel(tk.Frame):
                 self.show_items()
                 self.show_stock()
                 self.show_unplaced_items()
+                self.inv_man_frame.cat_item_entry.delete(0, tk.END)
+                self.inv_man_frame.item_entry.delete(0, tk.END)
             else:
                 msgbox.show_error_message_box("Error", message)
 
@@ -574,11 +584,16 @@ class AdminPanel(tk.Frame):
             # get the id of the item
             item_id = item_values[0]
             if msgbox.confirm_remove_item():
-                database.delete_item_by_id(item_id, db_path=DATABASE_PATH)
+                result = database.delete_item_by_id(item_id, db_path=DATABASE_PATH)
+                # if Error the show error message
+                if not result[0]:
+                    msgbox.show_error_message_box(title="Error", message=result[1])
+                    return
                 self.item_data = database.fetch_all_items(self.category_data, db_path=DATABASE_PATH)
                 # show the updated list
                 self.show_items()
                 self.show_stock()
+                self.show_unplaced_items()
             else:
                 pass
 
@@ -601,6 +616,8 @@ class AdminPanel(tk.Frame):
                 self.machine_data = database.get_all_machines(db_path=DATABASE_PATH)
                 # show the updated list
                 self.show_machines()
+                self.inv_man_frame.mac_name_entry.delete(0, tk.END)
+                self.inv_man_frame.mac_code_entry.delete(0, tk.END)
             else:
                 msgbox.show_error_message_box("Error", message)
 
@@ -690,6 +707,7 @@ class AdminPanel(tk.Frame):
             self.vp_rack_dropdown.config(textvariable=self.rack, values=self.racks)
             # show the updated list
             self.show_all_racks()
+            self.ip_man_frame.rack_entry.delete(0, tk.END)
         else:
             msgbox.show_error_message_box("Error", message)
 
@@ -701,11 +719,15 @@ class AdminPanel(tk.Frame):
             # get the id of the rack
             rack_id = item_values[1]
             if msgbox.confirm_remove_rack():
-                database.delete_rack_by_id(rack_id, db_path=DATABASE_PATH)
+                result = database.delete_rack_by_id(rack_id, db_path=DATABASE_PATH)
+                # if Error the show error message
+                if not result[0]:
+                    msgbox.show_error_message_box(title="Error", message=result[1])
+                    return
                 self.rack_details = database.get_all_racks(db_path=DATABASE_PATH)
                 self.racks = [name for id, name in database.get_all_racks(db_path=DATABASE_PATH)]
-                self.ip_rack_dropdown.config(textvariable=self.rack, values=self.racks)
-                self.vp_rack_dropdown.config(textvariable=self.rack, values=self.racks)
+                self.ip_rack_dropdown.config(textvariable=self.ip_rack_var, values=self.racks)
+                self.vp_rack_dropdown.config(textvariable=self.vp_rack_var, values=self.racks)
                 # show the updated list
                 self.show_all_racks()
             else:
@@ -779,6 +801,7 @@ class AdminPanel(tk.Frame):
                 database.delete_item_placement_by_id(ip_id, db_path=DATABASE_PATH)
                 # show the updated list
                 self.show_item_placement_data()
+                self.show_unplaced_items()
             else:
                 pass
 
