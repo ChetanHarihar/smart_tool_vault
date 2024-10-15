@@ -5,6 +5,7 @@ from gui_components.widgets import msgbox
 if __name__ == "__main__":
     root = tk.Tk()
     root.geometry(f"{SCREEN_SIZE[0]}x{SCREEN_SIZE[1]}")
+    root.resizable(False, False)
     root.title("Smart Tool Vault")
     style = ttk.Style(root)
 
