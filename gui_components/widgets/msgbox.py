@@ -59,6 +59,11 @@ def show_error_message_box(title, message):
 def show_success_message_box(message):
     messagebox.showinfo("Success", message)
 
+def exit_error_msg(root, message):
+    # Show exit error message
+    messagebox.showerror(title="Exit error", message=message)
+
+
 if __name__ == "__main__":
     root = tk.Tk()
 
