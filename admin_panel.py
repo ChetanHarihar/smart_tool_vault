@@ -8,12 +8,12 @@ from services import database
 
 
 class AdminPanel(tk.Frame):
-    def __init__(self, master=None, **kwargs):
+    def __init__(self, user_id, username, master=None, **kwargs):
         super().__init__(master, **kwargs)
         self.config(width=1024, height=576)
         self.root = master
-        self.user_id = None
-        self.user_name = None
+        self.user_id = user_id
+        self.user_name = username
         self.category_data = database.fetch_categories(db_path=DATABASE_PATH)
         self.item_data = database.fetch_all_items(self.category_data, db_path=DATABASE_PATH)
         self.machine_data = database.get_all_machines(db_path=DATABASE_PATH)
@@ -862,7 +862,7 @@ if __name__ == "__main__":
     root.tk.call("source", theme_path)
     style.theme_use("forest-light")
     
-    # Create an instance of EmployeePanel and pack it into the root window
+    # Create an instance of AdminPanel and pack it into the root window
     frame = AdminPanel(root)
     frame.pack()
 
