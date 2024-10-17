@@ -484,7 +484,6 @@ class AdminPanel(tk.Frame):
             self.show_users()
             self.user_man_frame.name_entry.delete(0, tk.END)
             self.user_man_frame.uid_entry.delete(0, tk.END)
-            self.user_man_frame.role_var.set(1)
         else:
             msgbox.show_error_message_box("Error", message)
 
@@ -513,17 +512,20 @@ class AdminPanel(tk.Frame):
 
     def add_category(self):
         name = self.inv_man_frame.cat_entry.get().upper()
-        success, message = database.add_category(name, db_path=DATABASE_PATH)
-        if success:
-            msgbox.show_success_message_box(message)
-            self.category_data = database.fetch_categories(db_path=DATABASE_PATH)
-            self.item_view_category_dropdown.config(textvariable=self.item_view_var, values=self.category_data)
-            self.stock_view_category_dropdown.config(textvariable=self.stock_view_var, values=self.category_data)
-            # show the updated list
-            self.show_categories()
-            self.inv_man_frame.cat_entry.delete(0, tk.END)
+        if name:
+            success, message = database.add_category(name, db_path=DATABASE_PATH)
+            if success:
+                msgbox.show_success_message_box(message)
+                self.category_data = database.fetch_categories(db_path=DATABASE_PATH)
+                self.item_view_category_dropdown.config(textvariable=self.item_view_var, values=self.category_data)
+                self.stock_view_category_dropdown.config(textvariable=self.stock_view_var, values=self.category_data)
+                # show the updated list
+                self.show_categories()
+                self.inv_man_frame.cat_entry.delete(0, tk.END)
+            else:
+                msgbox.show_error_message_box("Error", message)
         else:
-            msgbox.show_error_message_box("Error", message)
+                msgbox.show_error_message_box("Error", "Enter a valid category name.")
 
     def remove_category(self):
         # remove the selected category and update the treeview
@@ -561,20 +563,26 @@ class AdminPanel(tk.Frame):
     def add_item(self):
         cat_name = self.inv_man_frame.cat_item_entry.get().strip().upper()
         cat_id = database.get_category_id_by_name(cat_name, db_path=DATABASE_PATH)
+        print(cat_id)
         item_name = self.inv_man_frame.item_entry.get()
-        if cat_id is not None and item_name is not None:
-            success, message = database.add_item(cat_id, item_name, db_path=DATABASE_PATH)
-            if success:
-                msgbox.show_success_message_box(message)
-                self.item_data = database.fetch_all_items(self.category_data, db_path=DATABASE_PATH)
-                # show the updated list
-                self.show_items()
-                self.show_stock()
-                self.show_unplaced_items()
-                self.inv_man_frame.cat_item_entry.delete(0, tk.END)
-                self.inv_man_frame.item_entry.delete(0, tk.END)
+        if cat_id is not None:
+            if item_name:
+                success, message = database.add_item(cat_id, item_name, db_path=DATABASE_PATH)
+                if success:
+                    msgbox.show_success_message_box(message)
+                    self.item_data = database.fetch_all_items(self.category_data, db_path=DATABASE_PATH)
+                    # show the updated list
+                    self.show_items()
+                    self.show_stock()
+                    self.show_unplaced_items()
+                    self.inv_man_frame.cat_item_entry.delete(0, tk.END)
+                    self.inv_man_frame.item_entry.delete(0, tk.END)
+                else:
+                    msgbox.show_error_message_box("Error", message)
             else:
-                msgbox.show_error_message_box("Error", message)
+                    msgbox.show_error_message_box("Error", "Invalid item name.\nEnter a valid item name.")
+        else:
+            msgbox.show_error_message_box("Error", "Invalid category name.\nSpecified category doesn't exists.")
 
     def remove_item(self):
         # remove the selected item and update the treeview
@@ -609,7 +617,7 @@ class AdminPanel(tk.Frame):
     def add_machine(self):
         mac_name = self.inv_man_frame.mac_name_entry.get().strip().upper()
         mac_code = self.inv_man_frame.mac_code_entry.get().strip().upper()
-        if mac_name is not None and mac_code is not None:
+        if mac_name and mac_code:
             success, message = database.add_machine(mac_name, mac_code, db_path=DATABASE_PATH)
             if success:
                 msgbox.show_success_message_box(message)
@@ -620,16 +628,18 @@ class AdminPanel(tk.Frame):
                 self.inv_man_frame.mac_code_entry.delete(0, tk.END)
             else:
                 msgbox.show_error_message_box("Error", message)
+        else:
+                msgbox.show_error_message_box("Error", "Enter a valid Machine name and Machine code.")
 
     def remove_machine(self):
         # remove the selected machine and update the treeview
         selected_item = self.machine_treeview.focus()
         if selected_item:
-            item_values = self.item_treeview.item(selected_item, 'values')
+            item_values = self.machine_treeview.item(selected_item, 'values')
             # get the id of the item
-            machihe_id = item_values[0]
+            machine_id = item_values[0]
             if msgbox.confirm_remove_item():
-                database.delete_machine(machihe_id, db_path=DATABASE_PATH)
+                database.delete_machine(machine_id, db_path=DATABASE_PATH)
                 self.machine_data = database.get_all_machines(db_path=DATABASE_PATH)
                 # show the updated list
                 self.show_machines()
@@ -671,21 +681,24 @@ class AdminPanel(tk.Frame):
             try:
                 data = tuple(placement_info.values())[0]
                 rack, pos_label = data
+                print(f"Open msg: Topic={rack}, pos_label={pos_label}.")
                 # self.open_item(client=self.mqtt_client, topic=rack, pos_label=pos_label)
-            
+
                 if msgbox.confirm_item_restock():
                     database.restock_item(item_id, int(quantity), db_path=DATABASE_PATH)
                     self.item_data = database.fetch_all_items(self.category_data, db_path=DATABASE_PATH)
                     self.data_to_log = [self.user_name, category, item, ' ', ' ', str(quantity)]
                     # log data
                     # self.close_item(client=self.mqtt_client, topic=rack, pos_label=pos_label)
+                    print(f"Close msg: Topic={rack}, pos_label={pos_label}.")
                     self.show_stock()
-                else:
-                    pass
             
             except Exception as e:
                 print(e)
                 msgbox.show_error_message_box('Error', "Item not placed in the rack")
+
+            finally:
+                print(f"Close msg: Topic={rack}, pos_label={pos_label}.")
 
     def show_all_racks(self):
         self.delete_treeview_items(self.rack_treeview)
@@ -698,18 +711,21 @@ class AdminPanel(tk.Frame):
 
     def add_rack(self):
         name = self.ip_man_frame.rack_entry.get()
-        success, message = database.add_rack(name, db_path=DATABASE_PATH)
-        if success:
-            msgbox.show_success_message_box(message)
-            self.rack_details = database.get_all_racks(db_path=DATABASE_PATH)
-            self.racks = [name for id, name in database.get_all_racks(db_path=DATABASE_PATH)]
-            self.ip_rack_dropdown.config(textvariable=self.rack, values=self.racks)
-            self.vp_rack_dropdown.config(textvariable=self.rack, values=self.racks)
-            # show the updated list
-            self.show_all_racks()
-            self.ip_man_frame.rack_entry.delete(0, tk.END)
+        if name:
+            success, message = database.add_rack(name, db_path=DATABASE_PATH)
+            if success:
+                msgbox.show_success_message_box(message)
+                self.rack_details = database.get_all_racks(db_path=DATABASE_PATH)
+                self.racks = [name for id, name in database.get_all_racks(db_path=DATABASE_PATH)]
+                self.ip_rack_dropdown.config(textvariable=self.ip_rack_var, values=self.racks)
+                self.vp_rack_dropdown.config(textvariable=self.vp_rack_var, values=self.racks)
+                # show the updated list
+                self.show_all_racks()
+                self.ip_man_frame.rack_entry.delete(0, tk.END)
+            else:
+                msgbox.show_error_message_box("Error", message)
         else:
-            msgbox.show_error_message_box("Error", message)
+                msgbox.show_error_message_box("Error", "Enter a valid rack name.")
 
     def remove_rack(self):
         # remove the selected rack and update the treeview
@@ -755,7 +771,7 @@ class AdminPanel(tk.Frame):
     def place_item(self):
         # check for integrity and place it (update in the database)
         rack = self.ip_rack_dropdown.get()
-        label = self.ip_row_dropdown.get()+self.ip_col_dropdown.get()
+        label = self.ip_row_dropdown.get() + self.ip_col_dropdown.get()
         for id, name in self.rack_details:
             if name == rack:
                 rack_id = id
@@ -863,7 +879,7 @@ if __name__ == "__main__":
     style.theme_use("forest-light")
     
     # Create an instance of AdminPanel and pack it into the root window
-    frame = AdminPanel(root)
+    frame = AdminPanel(master=root, user_id="1234", username="Chetan")
     frame.pack()
 
     frame.update_datetime()
