@@ -12,9 +12,8 @@ class LoginPanel(tk.Frame):
         self.role = None
         self.login_failed_window = None
         self.scan = True
-        self.user_data = None
-        self.employee_panel = EmployeePanel(self.root)
-        self.admin_panel = AdminPanel(self.root)
+        self.employee_panel = None
+        self.admin_panel = None
         self.pack_propagate(False)
         self.init_ui()
     
@@ -78,40 +77,57 @@ class LoginPanel(tk.Frame):
         self.scan_frame.pack(fill="both", expand=True)
 
     def check_scan(self):
-        if self.scan:
-            print("Scanning...")
-            scanned_ID = self.card_id.get()
-            if scanned_ID:
-                # check the role and validate the scan
-                scan_result = database.check_scan_result(uid=scanned_ID, role=self.role, db_path=DATABASE_PATH)
-                # if scan_result:
-                if scan_result:
-                    self.user_id = scan_result[0]
-                    self.username = scan_result[1]
-                    if self.login_failed_window and self.login_failed_window.winfo_exists():
-                        self.login_failed_window.destroy()
-                    self.login_success_window = LoginSuccess(master=self.root, username=self.username)
-                    print("Valid card")
-                    self.scan = False
-                    if self.role == 1:
-                        # load admin panel
-                        pass
+        if self.role != None:
+            if self.scan:
+                print("Scanning...")
+                scanned_ID = self.card_id.get()
+                if scanned_ID:
+                    # check the role and validate the scan
+                    scan_result = database.check_scan_result(uid=scanned_ID, role=self.role, db_path=DATABASE_PATH)
+                    # if scan_result:
+                    if scan_result:
+                        user_id = scan_result[0]
+                        username = scan_result[1]
+                        if self.login_failed_window and self.login_failed_window.winfo_exists():
+                            self.login_failed_window.destroy()
+                        self.login_success_window = LoginSuccess(master=self.root, username=username)
+                        print("Valid card")
+                        self.scan = False
+                        if self.role == 1:
+                            # load admin panel
+                            # Set the user id and name
+                            self.destroy()  # Destroy login frame
+                            self.admin_panel = AdminPanel(master=self.root, user_id=user_id, username=username)
+                            self.admin_panel.pack()
+                            self.admin_panel.update_datetime()
+                        else:
+                            # load employee panel
+                            # Set the user id and name
+                            self.destroy()  # Destroy login frame
+                            self.employee_panel = EmployeePanel(master=self.root, user_id=user_id, username=username)
+                            self.employee_panel.pack()
+                            self.employee_panel.update_datetime()
                     else:
-                        # load employee panel
-                        pass
-                else:
-                    if self.login_failed_window is None or not self.login_failed_window.winfo_exists():
-                        self.login_failed_window = LoginFailed(self.root)
-                    print("Invalid card")
-                    self.card_id.delete(0, tk.END)
-                    self.scan_frame.pack_forget()
-                    self.pack(fill="both", expand=True)
+                        if self.login_failed_window is None or not self.login_failed_window.winfo_exists():
+                            self.login_failed_window = LoginFailed(self.root)
+                        print("Invalid card")
+                        self.role = None
+                        self.card_id.delete(0, tk.END)
+                        self.scan_frame.pack_forget()
+                        self.pack(fill="both", expand=True)
 
-        self.root.after(3000, self.check_scan)  # Schedule the function to run again after 3000 ms (3 seconds)
+            self.root.after(3000, self.check_scan)  # Schedule the function to run again after 3000 ms (3 seconds)
 
 if __name__ == "__main__":
     root = tk.Tk()
     root.geometry(f"{SCREEN_SIZE[0]}x{SCREEN_SIZE[1]}")
+    style = ttk.Style(root)
+
+    # build the path to the theme file
+    theme_path = os.path.join(BASE_DIR, "theme", "forest-light.tcl")
+
+    root.tk.call("source", theme_path)
+    style.theme_use("forest-light")
     
     # Create the login panel and pack it into the root window
     frame = LoginPanel(root)
