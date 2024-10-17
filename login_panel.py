@@ -98,14 +98,14 @@ class LoginPanel(tk.Frame):
                             # Set the user id and name
                             self.destroy()  # Destroy login frame
                             self.admin_panel = AdminPanel(master=self.root, user_id=user_id, username=username)
-                            self.admin_panel.pack()
+                            self.admin_panel.pack(fill="both", expand=True)
                             self.admin_panel.update_datetime()
                         else:
                             # load employee panel
                             # Set the user id and name
                             self.destroy()  # Destroy login frame
                             self.employee_panel = EmployeePanel(master=self.root, user_id=user_id, username=username)
-                            self.employee_panel.pack()
+                            self.employee_panel.pack(fill="both", expand=True)
                             self.employee_panel.update_datetime()
                     else:
                         if self.login_failed_window is None or not self.login_failed_window.winfo_exists():
