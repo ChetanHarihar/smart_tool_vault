@@ -90,10 +90,18 @@ class InventoryManagement(tk.Frame):
         self.category_label_frame.pack_propagate(False)
         self.category_label_frame.pack(pady=(15,0))
 
-        tk.Label(self.category_label_frame, text="Category Name:").pack(side="left", padx=(5,5))
+        self.add_category_widget_frame = tk.Frame(self.category_label_frame)
+        self.add_category_widget_frame.pack(side="left", padx=(5,5))
 
-        self.cat_entry = tk.Entry(self.category_label_frame, width=30)
-        self.cat_entry.pack(side="left", padx=(5,5))
+        tk.Label(self.add_category_widget_frame, text="Category Name:").grid(row=0,column=0,sticky='w')
+
+        self.cat_entry = tk.Entry(self.add_category_widget_frame, width=30)
+        self.cat_entry.grid(row=0,column=1, pady=(5))
+
+        tk.Label(self.add_category_widget_frame, text="Minimum stock:").grid(row=1,column=0,sticky='w')
+
+        self.min_stock_entry = tk.Entry(self.add_category_widget_frame, width=30)
+        self.min_stock_entry.grid(row=1,column=1)
 
         self.cat_add_btn = tk.Button(self.category_label_frame, text="Add", command=None)
         self.cat_add_btn.pack(side="left", padx=(5,5))
