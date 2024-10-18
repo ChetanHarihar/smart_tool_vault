@@ -25,11 +25,12 @@ CREATE TABLE IF NOT EXISTS machine (
 );
 ''')
 
-# Creating the Categories table
+# Creating the Categories table and adding minimum stock data
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS category (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL UNIQUE
+    name TEXT NOT NULL UNIQUE,
+    min_stock_value INTEGER NOT NULL DEFAULT 0
 );
 ''')
 
