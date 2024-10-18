@@ -242,7 +242,7 @@ def remove_user_by_id(user_id, db_path):
         cursor.execute("DELETE FROM user WHERE id = ?", (user_id,))
         conn.commit()
 
-        print(f"User with ID {user_id} removed successfully.")
+        print(f"User removed successfully.")
 
     except sqlite3.Error as e:
         print("Error removing user:", e)
@@ -251,13 +251,13 @@ def remove_user_by_id(user_id, db_path):
         if conn:
             conn.close()
 
-def add_category(name, db_path):
+def add_category(name, min_stock, db_path):
     conn = None
     try:
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
 
-        cursor.execute("INSERT INTO category (name) VALUES (?)", (name,))
+        cursor.execute('INSERT INTO category (name, min_stock_value) VALUES (?, ?)', (name, min_stock))
         conn.commit()
 
         print(f"Category '{name}' added successfully.")
@@ -286,8 +286,8 @@ def delete_category_by_id(category_id, db_path):
         cursor.execute("DELETE FROM category WHERE id = ?", (category_id,))
         conn.commit()
 
-        print(f"Category with ID {category_id} deleted successfully.")
-        return True, f"Category with ID {category_id} deleted successfully."
+        print(f"Category deleted successfully.")
+        return True, f"Category deleted successfully."
 
     except sqlite3.Error as e:
         error_message = f"Error deleting category: {e}"
@@ -311,7 +311,7 @@ def add_item(category_id, item, db_path, quantity=0):
         return True, f"Item '{item}' added successfully."
 
     except sqlite3.IntegrityError:
-        error_message = f"Item '{item}' for category ID {category_id} already exists."
+        error_message = f"Item '{item}' for category already exists."
         print(error_message)
         return False, error_message
 
@@ -333,8 +333,8 @@ def delete_item_by_id(item_id, db_path):
         cursor.execute("DELETE FROM item WHERE id = ?", (item_id,))
         conn.commit()
 
-        print(f"Item with ID {item_id} deleted successfully.")
-        return True, f"Item with ID {item_id} deleted successfully."
+        print(f"Item deleted successfully.")
+        return True, f"Item deleted successfully."
 
     except sqlite3.Error as e:
         error_message = f"Error deleting item: {e}"
@@ -492,8 +492,8 @@ def delete_rack_by_id(rack_id, db_path):
         cursor.execute("DELETE FROM rack WHERE id = ?", (rack_id,))
         conn.commit()
 
-        print(f"Rack with ID {rack_id} deleted successfully.")
-        return True, f"Rack with ID {rack_id} deleted successfully."
+        print(f"Rack deleted successfully.")
+        return True, f"Rack deleted successfully."
 
     except sqlite3.Error as e:
         error_message = f"Error deleting rack: {e}"
@@ -572,8 +572,8 @@ def delete_item_placement_by_id(item_placement_id, db_path):
         cursor.execute("DELETE FROM item_placement WHERE id = ?", (item_placement_id,))
         conn.commit()
         
-        print(f"Item placement with ID {item_placement_id} deleted successfully.")
-        return True, f"Item placement with ID {item_placement_id} deleted successfully."
+        print(f"Item placement deleted successfully.")
+        return True, f"Item placement deleted successfully."
     
     except sqlite3.Error as e:
         error_message = f"Error deleting item placement: {e}"
@@ -771,7 +771,7 @@ def delete_machine(machine_id, db_path):
         else:
             conn.commit()
             print("Machine deleted successfully.")
-            return True, f"Machine with id {machine_id} deleted."
+            return True, f"Machine deleted successfully."
     
     except sqlite3.Error as e:
         print(f"Database error occurred: {e}")
