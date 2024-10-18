@@ -512,18 +512,23 @@ class AdminPanel(tk.Frame):
 
     def add_category(self):
         name = self.inv_man_frame.cat_entry.get().upper()
+        min_stock = self.inv_man_frame.min_stock_entry.get()
         if name:
-            success, message = database.add_category(name, db_path=DATABASE_PATH)
-            if success:
-                msgbox.show_success_message_box(message)
-                self.category_data = database.fetch_categories(db_path=DATABASE_PATH)
-                self.item_view_category_dropdown.config(textvariable=self.item_view_var, values=self.category_data)
-                self.stock_view_category_dropdown.config(textvariable=self.stock_view_var, values=self.category_data)
-                # show the updated list
-                self.show_categories()
-                self.inv_man_frame.cat_entry.delete(0, tk.END)
+            if min_stock.isnumeric():
+                success, message = database.add_category(name=name, min_stock=int(min_stock), db_path=DATABASE_PATH)
+                if success:
+                    msgbox.show_success_message_box(message)
+                    self.category_data = database.fetch_categories(db_path=DATABASE_PATH)
+                    self.item_view_category_dropdown.config(textvariable=self.item_view_var, values=self.category_data)
+                    self.stock_view_category_dropdown.config(textvariable=self.stock_view_var, values=self.category_data)
+                    # show the updated list
+                    self.show_categories()
+                    self.inv_man_frame.cat_entry.delete(0, tk.END)
+                    self.inv_man_frame.min_stock_entry.delete(0, tk.END)
+                else:
+                    msgbox.show_error_message_box("Error", message)
             else:
-                msgbox.show_error_message_box("Error", message)
+                msgbox.show_error_message_box("Error", "Enter a valid number for Minimum stock.")
         else:
                 msgbox.show_error_message_box("Error", "Enter a valid category name.")
 
