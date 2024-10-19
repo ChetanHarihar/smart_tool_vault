@@ -23,7 +23,7 @@ class AdminPanel(tk.Frame):
         self.cols = ['1', '2', '3', '4', '5', '6']
         self.data_to_log = None
         # Connect ot MQTT Server
-        # self.mqtt_client = connect_mqtt(mqtt_server=MQTT_SERVER, mqtt_port=MQTT_PORT)
+        self.mqtt_client = connect_mqtt(mqtt_server=MQTT_SERVER, mqtt_port=MQTT_PORT)
         self.init_ui()
 
     def init_ui(self):
@@ -687,14 +687,14 @@ class AdminPanel(tk.Frame):
                 data = tuple(placement_info.values())[0]
                 rack, pos_label = data
                 print(f"Open msg: Topic={rack}, pos_label={pos_label}.")
-                # self.open_item(client=self.mqtt_client, topic=rack, pos_label=pos_label)
+                self.open_item(client=self.mqtt_client, sub_topic=rack, pos_label=pos_label)
 
                 if msgbox.confirm_item_restock():
                     database.restock_item(item_id, int(quantity), db_path=DATABASE_PATH)
                     self.item_data = database.fetch_all_items(self.category_data, db_path=DATABASE_PATH)
                     self.data_to_log = [self.user_name, category, item, ' ', ' ', str(quantity)]
                     # log data
-                    # self.close_item(client=self.mqtt_client, topic=rack, pos_label=pos_label)
+                    self.close_item(client=self.mqtt_client, sub_topic=rack, pos_label=pos_label)
                     print(f"Close msg: Topic={rack}, pos_label={pos_label}.")
                     self.show_stock()
             
@@ -826,7 +826,7 @@ class AdminPanel(tk.Frame):
             else:
                 pass
 
-    def open_item(self, client, topic, pos_label):
+    def open_item(self, client, sub_topic, pos_label):
         """
         Opens an item by sending an MQTT message.
 
@@ -836,9 +836,9 @@ class AdminPanel(tk.Frame):
             pos_label: The position label of the item to be opened.
         """
         open_message = f"('{pos_label}', 1)"
-        # handle_publish(client=client, topic=f"smart_vault/{topic}", message=open_message)
+        handle_publish(client=client, topic=f"{BASE_TOPIC}/{sub_topic}", message=open_message)
 
-    def close_item(self, client, topic, pos_label):
+    def close_item(self, client, sub_topic, pos_label):
         """
         Closes an item by sending an MQTT message.
 
@@ -848,7 +848,7 @@ class AdminPanel(tk.Frame):
             pos_label: The position label of the item to be closed.
         """
         close_message = f"('{pos_label}', 0)"
-        # handle_publish(client=client, topic=f"smart_vault/{topic}", message=close_message)
+        handle_publish(client=client, topic=f"{BASE_TOPIC}/{sub_topic}", message=close_message)
 
     def clear_id_entry(self):
         self.card_id.delete(0, tk.END)
@@ -865,10 +865,10 @@ class AdminPanel(tk.Frame):
 
         if action == 'OPEN':
             pass
-            # self.open_item(client=self.mqtt_client, topic=rack, pos_label=row+col)
+            self.open_item(client=self.mqtt_client, sub_topic=rack, pos_label=row+col)
         elif action == 'CLOSE':
             pass
-            # self.close_item(client=self.mqtt_client, topic=rack, pos_label=row+col)
+            self.close_item(client=self.mqtt_client, sub_topic=rack, pos_label=row+col)
 
 
 # If this file is run directly for testing purposes
