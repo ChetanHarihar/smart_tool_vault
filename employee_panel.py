@@ -30,7 +30,7 @@ class EmployeePanel(tk.Frame):
         self.data_to_log = None
         self.update_item_data = None
         # Connect ot MQTT Server
-        # self.mqtt_client = connect_mqtt(mqtt_server=MQTT_SERVER, mqtt_port=MQTT_PORT)   # Connect ot MQTT Server
+        self.mqtt_client = connect_mqtt(mqtt_server=MQTT_SERVER, mqtt_port=MQTT_PORT)   # Connect ot MQTT Server
         self.select_machine_frame()
 
     def select_machine_frame(self):
@@ -398,21 +398,22 @@ class EmployeePanel(tk.Frame):
         if action == "start" or action == "next":
             if self.current_command:
                 topic, message = self.current_command
-                print(topic, message)
-                # handle_publish(client=self.mqtt_client, topic=topic, message=message.replace(", 1)", ", 0)"))  # Send close command for current
-                # change the status of the checkbox
+                handle_publish(client=self.mqtt_client, topic=topic, message=message.replace(", 1)", ", 0)"))   # Send close command
+                # Change the status of the checkbox
                 self.check_checkboxes()
-                q = database.update_item_quantity(self.update_item_data[0], int(self.update_item_data[1]), db_path=DATABASE_PATH)
-                # check for the min stock
+                # Update the quantity of the item in the database 
+                remaining_quantity = database.update_item_quantity(self.update_item_data[0], int(self.update_item_data[1]), db_path=DATABASE_PATH)
+                # Check for the min stock
+                # Log the data
             try:
                 item_id, (rack, pos_label) = next(self.session_generator)
                 self.pickup_data_label.config(text=f"Collect {self.pickup_data[str(item_id)][0]}\nQuantity = {self.pickup_data[str(item_id)][1]}\nat {rack}")
                 self.data_to_log = [self.user_name, self.pickup_data[str(item_id)][2], self.pickup_data[str(item_id)][0], str(self.machine_name), self.pickup_data[str(item_id)][1], ' ']
                 self.update_item_data = [str(item_id), self.pickup_data[str(item_id)][1]]
-                topic = f"smart_vault/{rack}"
+                topic = f"{BASE_TOPIC}/{rack}"
                 open_message = f"('{pos_label}', 1)"
                 self.current_command = (topic, open_message)
-                # handle_publish(client=self.mqtt_client, topic=topic, message=open_message)  # Send open command for next
+                handle_publish(client=self.mqtt_client, topic=topic, message=open_message)  # Send open command
                 self.session_button.config(text="Next")
             except StopIteration:
                 self.session_button.config(text="Session Ended", state="disabled")
@@ -423,7 +424,7 @@ class EmployeePanel(tk.Frame):
         elif action == "terminate":
             if self.current_command:
                 topic, message = self.current_command
-                # handle_publish(client=self.mqtt_client, topic=topic, message=message.replace(", 1)", ", 0)"))  # Ensure current is closed
+                handle_publish(client=self.mqtt_client, topic=topic, message=message.replace(", 1)", ", 0)"))  # Ensure close if current is open
             self.terminate_btn.config(text="Session Terminated", state="disabled")
             self.terminate_btn.config(state="disabled")
             self.session_button.config(state="disabled")  # Disable start session button on terminate
