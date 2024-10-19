@@ -44,7 +44,7 @@ def connect_mqtt(mqtt_server, mqtt_port):
     return client
 
 if __name__ == "__main__":
-    MQTT_SERVER = '192.168.XXX.XX'
+    MQTT_SERVER = '192.168.XXX.XXX'
     MQTT_PORT = 1883
 
     # Example usage
@@ -52,7 +52,7 @@ if __name__ == "__main__":
     # Now you can use mqtt_client to publish messages or perform other MQTT operations
 
     # Publishing a sample message
-    sample_topic = "mqtt/test"
+    sample_topic = "your_topic"
     sample_message = "open"
     handle_publish(mqtt_client, sample_topic, sample_message)
     
