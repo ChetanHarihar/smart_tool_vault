@@ -780,3 +780,34 @@ def delete_machine(machine_id, db_path):
     finally:
         if conn:
             conn.close()
+
+def get_min_stock_value(category_name, db_path):
+    conn = None
+    try:
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        
+        # Execute the query to get the min_stock_value for the given category name
+        cursor.execute('''
+            SELECT min_stock_value 
+            FROM category 
+            WHERE name = ?;
+        ''', (category_name,))
+        
+        # Fetch the result
+        min_stock_value = cursor.fetchone()
+        
+        if min_stock_value:
+            print(f"Minimum stock value for {category_name}: {min_stock_value[0]}")
+            return min_stock_value[0]
+        else:
+            print(f"No category found with the name {category_name}.")
+            return None
+    
+    except sqlite3.Error as e:
+        print(f"Database error occurred: {e}")
+        return None
+    
+    finally:
+        if conn:
+            conn.close()
