@@ -2,6 +2,8 @@ from settings.config import *
 from gui_components.widgets.treeview import TreeView
 from gui_components.widgets.topbar import TopBar
 from services.mqtt_functions import connect_mqtt, handle_publish
+from services.firebase_doc_manager import upsert_doc
+from services.email_sender import restock_email
 from gui_components.widgets import msgbox
 from services import database
 
@@ -23,12 +25,15 @@ class EmployeePanel(tk.Frame):
         self.pickup_data = None
         self.placement_info = None
         self.session_generator = None
+        self.current_item_id = None
         self.checkboxes = []  # List to hold checkbox widgets
         self.checkbox_vars = []  # List to hold the variables associated with checkboxes
         self.current_index = 0
         self.current_command = None
         self.data_to_log = None
+        self.min_stock_msg = ""
         self.update_item_data = None
+        self.nested_item_data = {}
         # Connect ot MQTT Server
         self.mqtt_client = connect_mqtt(mqtt_server=MQTT_SERVER, mqtt_port=MQTT_PORT)   # Connect ot MQTT Server
         self.select_machine_frame()
@@ -404,12 +409,20 @@ class EmployeePanel(tk.Frame):
                 # Update the quantity of the item in the database 
                 remaining_quantity = database.update_item_quantity(self.update_item_data[0], int(self.update_item_data[1]), db_path=DATABASE_PATH)
                 # Check for the min stock
+                min_stock_value = database.get_min_stock_value(category_name=self.pickup_data[str(self.current_item_id)][2], db_path=DATABASE_PATH)
+                if remaining_quantity <= min_stock_value:
+                    # Get the item name and quantity
+                    item_name = self.pickup_data[str(self.current_item_id)][0]
+                    self.min_stock_msg += f"{item_name} only {remaining_quantity} left.\n"
                 # Log the data
+                # Update items structure
+                self.convert_to_nested_items_structure(self.pickup_data[str(self.current_item_id)])
+                print(self.nested_item_data)
             try:
-                item_id, (rack, pos_label) = next(self.session_generator)
-                self.pickup_data_label.config(text=f"Collect {self.pickup_data[str(item_id)][0]}\nQuantity = {self.pickup_data[str(item_id)][1]}\nat {rack}")
-                self.data_to_log = [self.user_name, self.pickup_data[str(item_id)][2], self.pickup_data[str(item_id)][0], str(self.machine_name), self.pickup_data[str(item_id)][1], ' ']
-                self.update_item_data = [str(item_id), self.pickup_data[str(item_id)][1]]
+                self.current_item_id, (rack, pos_label) = next(self.session_generator)
+                self.pickup_data_label.config(text=f"Collect {self.pickup_data[str(self.current_item_id)][0]}\nQuantity = {self.pickup_data[str(self.current_item_id)][1]}\nat {rack}")
+                self.data_to_log = [self.user_name, self.pickup_data[str(self.current_item_id)][2], self.pickup_data[str(self.current_item_id)][0], str(self.machine_name), self.pickup_data[str(self.current_item_id)][1], ' ']
+                self.update_item_data = [str(self.current_item_id), self.pickup_data[str(self.current_item_id)][1]]
                 topic = f"{BASE_TOPIC}/{rack}"
                 open_message = f"('{pos_label}', 1)"
                 self.current_command = (topic, open_message)
@@ -420,6 +433,12 @@ class EmployeePanel(tk.Frame):
                 self.terminate_btn.config(text="Session Terminated", state="disabled")
                 self.terminate_btn.config(state="disabled")  # Disable terminate button at end
                 self.session_button.config(state="disabled")  # Also disable start session button
+                # Send restock email
+                if self.min_stock_msg:
+                    restock_email(email_sender=SENDER_EMAIL, password=APP_PASSWORD, email_receiver=RECEIVER_EMAIL, subject="RESTOCK ITEMS ALERT!", message=self.min_stock_msg)
+                # Update user item data in firebase
+                data = {'name': self.user_name, 'items':self.nested_item_data}
+                upsert_doc(collection_name='user_items', document_id=str(self.user_id), data=data, firebase_credentials_path=SAK_PATH)
                 self.enable_exit()
         elif action == "terminate":
             if self.current_command:
@@ -428,6 +447,12 @@ class EmployeePanel(tk.Frame):
             self.terminate_btn.config(text="Session Terminated", state="disabled")
             self.terminate_btn.config(state="disabled")
             self.session_button.config(state="disabled")  # Disable start session button on terminate
+            # Send restock email
+            if self.min_stock_msg:
+                restock_email(email_sender=SENDER_EMAIL, password=APP_PASSWORD, email_receiver=RECEIVER_EMAIL, subject="RESTOCK ITEMS ALERT!", message=self.min_stock_msg)
+            # Update user item data in firebase
+            data = {'name': self.user_name, 'items':self.nested_item_data}
+            upsert_doc(collection_name='user_items', document_id=str(self.user_id), data=data, firebase_credentials_path=SAK_PATH)
             self.enable_exit()
 
     def check_checkboxes(self):
@@ -436,6 +461,25 @@ class EmployeePanel(tk.Frame):
             self.checkbox_vars[self.current_index].set(True)
             self.checkboxes[self.current_index].configure(state='disabled')
             self.current_index += 1  # Move to the next checkbox
+
+    def convert_to_nested_items_structure(self, item_tuple):
+        # Unpack the tuple
+        item_name, quantity, category = item_tuple
+
+        # Ensure quantity is stored as an integer
+        quantity = int(quantity)
+
+        # If the category doesn't exist in the output dictionary, add it
+        if category not in self.nested_item_data:
+            self.nested_item_data[category] = {}
+
+        # Add or update the item and its quantity under the corresponding category
+        if item_name in self.nested_item_data[category]:
+            # If the item already exists, increment the quantity
+            self.nested_item_data[category][item_name] += quantity
+        else:
+            # If the item doesn't exist, add it with the provided quantity
+            self.nested_item_data[category][item_name] = quantity
 
     def update_datetime(self):
         self.top_bar.update_datetime()
