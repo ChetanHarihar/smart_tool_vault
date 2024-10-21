@@ -86,7 +86,7 @@ class LoginPanel(tk.Frame):
                     scan_result = database.check_scan_result(uid=scanned_ID, role=self.role, db_path=DATABASE_PATH)
                     # if scan_result:
                     if scan_result:
-                        user_id = scan_result[0]
+                        user_id = scanned_ID
                         username = scan_result[1]
                         if self.login_failed_window and self.login_failed_window.winfo_exists():
                             self.login_failed_window.destroy()
