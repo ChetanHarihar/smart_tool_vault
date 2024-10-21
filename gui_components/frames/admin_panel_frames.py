@@ -293,7 +293,7 @@ if __name__ == "__main__":
     style = ttk.Style(root)
 
     # build the path to the theme file
-    base_dir = base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     theme_path = os.path.join(base_dir, "theme", "forest-light.tcl")
 
     root.tk.call("source", theme_path)
