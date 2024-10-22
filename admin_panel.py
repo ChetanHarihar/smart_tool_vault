@@ -5,6 +5,7 @@ from gui_components.widgets.topbar import TopBar
 from gui_components.frames.admin_panel_frames import *
 from services.mqtt_functions import connect_mqtt, handle_publish
 from services import database
+from services.data_logger import log_data
 
 
 class AdminPanel(tk.Frame):
@@ -692,10 +693,11 @@ class AdminPanel(tk.Frame):
                 if msgbox.confirm_item_restock():
                     database.restock_item(item_id, int(quantity), db_path=DATABASE_PATH)
                     self.item_data = database.fetch_all_items(self.category_data, db_path=DATABASE_PATH)
-                    self.data_to_log = [self.user_name, category, item, ' ', ' ', str(quantity)]
-                    # log data
                     self.close_item(client=self.mqtt_client, sub_topic=rack, pos_label=pos_label)
                     print(f"Close msg: Topic={rack}, pos_label={pos_label}.")
+                    # log data
+                    self.data_to_log = [self.user_name, '', category, item, '', str(quantity)]
+                    log_data(directory=LOGS_DIRECTORY, row_data=self.data_to_log)
                     self.show_stock()
             
             except Exception as e:
