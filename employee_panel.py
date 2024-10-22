@@ -4,6 +4,7 @@ from gui_components.widgets.topbar import TopBar
 from services.mqtt_functions import connect_mqtt, handle_publish
 from services.firebase_doc_manager import upsert_doc
 from services.email_sender import restock_email
+from services.data_logger import log_data
 from gui_components.widgets import msgbox
 from services import database
 
@@ -407,7 +408,7 @@ class EmployeePanel(tk.Frame):
                 # Change the status of the checkbox
                 self.check_checkboxes()
                 # Update the quantity of the item in the database 
-                remaining_quantity = database.update_item_quantity(self.update_item_data[0], int(self.update_item_data[1]), db_path=DATABASE_PATH)
+                remaining_quantity = database.update_item_quantity(item_id=self.update_item_data[0], subtract_amount=int(self.update_item_data[1]), db_path=DATABASE_PATH)
                 # Check for the min stock
                 min_stock_value = database.get_min_stock_value(category_name=self.pickup_data[str(self.current_item_id)][2], db_path=DATABASE_PATH)
                 if remaining_quantity <= min_stock_value:
@@ -415,13 +416,14 @@ class EmployeePanel(tk.Frame):
                     item_name = self.pickup_data[str(self.current_item_id)][0]
                     self.min_stock_msg += f"{item_name} only {remaining_quantity} left.\n"
                 # Log the data
+                self.data_to_log = [self.user_name, self.machine_code, self.pickup_data[str(self.current_item_id)][2], self.pickup_data[str(self.current_item_id)][0], self.update_item_data[1], '']
+                log_data(directory=LOGS_DIRECTORY, row_data=self.data_to_log)
                 # Update items structure
                 self.convert_to_nested_items_structure(self.pickup_data[str(self.current_item_id)])
                 print(self.nested_item_data)
             try:
                 self.current_item_id, (rack, pos_label) = next(self.session_generator)
                 self.pickup_data_label.config(text=f"Collect {self.pickup_data[str(self.current_item_id)][0]}\nQuantity = {self.pickup_data[str(self.current_item_id)][1]}\nat {rack}")
-                self.data_to_log = [self.user_name, self.pickup_data[str(self.current_item_id)][2], self.pickup_data[str(self.current_item_id)][0], str(self.machine_name), self.pickup_data[str(self.current_item_id)][1], ' ']
                 self.update_item_data = [str(self.current_item_id), self.pickup_data[str(self.current_item_id)][1]]
                 topic = f"{BASE_TOPIC}/{rack}"
                 open_message = f"('{pos_label}', 1)"
@@ -437,8 +439,9 @@ class EmployeePanel(tk.Frame):
                 if self.min_stock_msg:
                     restock_email(email_sender=SENDER_EMAIL, password=APP_PASSWORD, email_receiver=RECEIVER_EMAIL, subject="RESTOCK ITEMS ALERT!", message=self.min_stock_msg)
                 # Update user item data in firebase
-                data = {'name': self.user_name, 'items':self.nested_item_data}
-                upsert_doc(collection_name='user_items', document_id=str(self.user_id), data=data, firebase_credentials_path=SAK_PATH)
+                if self.nested_item_data:
+                    data = {'name': self.user_name, 'items':self.nested_item_data}
+                    upsert_doc(collection_name='user_items', document_id=str(self.user_id), data=data, firebase_credentials_path=SAK_PATH)
                 self.enable_exit()
         elif action == "terminate":
             if self.current_command:
@@ -451,8 +454,9 @@ class EmployeePanel(tk.Frame):
             if self.min_stock_msg:
                 restock_email(email_sender=SENDER_EMAIL, password=APP_PASSWORD, email_receiver=RECEIVER_EMAIL, subject="RESTOCK ITEMS ALERT!", message=self.min_stock_msg)
             # Update user item data in firebase
-            data = {'name': self.user_name, 'items':self.nested_item_data}
-            upsert_doc(collection_name='user_items', document_id=str(self.user_id), data=data, firebase_credentials_path=SAK_PATH)
+            if self.nested_item_data:
+                data = {'name': self.user_name, 'items':self.nested_item_data}
+                upsert_doc(collection_name='user_items', document_id=str(self.user_id), data=data, firebase_credentials_path=SAK_PATH)
             self.enable_exit()
 
     def check_checkboxes(self):
