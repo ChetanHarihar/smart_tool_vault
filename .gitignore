@@ -5,3 +5,4 @@ smartvault.db
 settings/config.py
 smart_tool_vault_venv
 settings/serviceAccountKey.json
+*.xlsx
