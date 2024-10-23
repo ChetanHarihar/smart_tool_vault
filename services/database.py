@@ -676,7 +676,7 @@ def add_rack_position_and_item_placement(rack_id, position_label, item_id, db_pa
 
         success_message = f"Position '{position_label}' added successfully to rack ID {rack_id} and item ID {item_id} placed successfully in rack position ID {new_rack_position_id}."
         print(success_message)
-        return True, success_message
+        return True, "Item placed successfully in rack"
 
     except sqlite3.IntegrityError as e:
         if "UNIQUE constraint failed: rack_position.rack_id, rack_position.position_label" in str(e):
