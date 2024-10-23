@@ -7,7 +7,10 @@ from umqtt.simple import MQTTClient
 SSID = 'Your Network'       # WiFi SSID
 PASSWORD = 'Your Password'      # WiFi Password
 MQTT_SERVER = '192.168.XXX.XX'      # IP address of the MQTT server
-MQTT_TOPIC = 'Your Topic'       # MQTT topic to subscribe to
+MQTT_PORT = 1883
+BASE_TOPIC = 'Your Topic'   # MQTT BASE TOPIC
+RACK_NAME = 'RACK NAME'       # DEVICE NAME
+MQTT_TOPIC = BASE_TOPIC + '/' + RACK_NAME       # MQTT topic to subscribe to
 
 # Define GPIO pins for the lock
 LOCK_PINS = [13, 12, 14, 27, 26]
@@ -51,7 +54,7 @@ def connect_wifi():
 
 def connect_mqtt():
     """Function to connect to the MQTT broker and subscribe to a topic."""
-    client = MQTTClient('rack_1', MQTT_SERVER)
+    client = MQTTClient(RACK_NAME, MQTT_SERVER, MQTT_PORT)
     client.set_callback(mqtt_callback)
     client.connect()
     client.subscribe(MQTT_TOPIC.encode())
@@ -106,10 +109,8 @@ def set_led(channel, action):
     """Control LED status based on channel and action (True to turn ON, False to turn OFF)."""
     if channel < 16:
         SIG1.value(action)
-        SIG2.value(int(not action))
     else:
         SIG2.value(action)
-        SIG1.value(int(not action))
     print(f"Channel {channel} LED {'turned ON' if action else 'turned OFF'}")
 
 def main():
