@@ -475,7 +475,7 @@ class AdminPanel(tk.Frame):
         name = self.user_man_frame.name_entry.get().capitalize()
         uid = self.user_man_frame.uid_entry.get()
         role = self.user_man_frame.role_var.get()
-        print("\nUser details:\n", f"Name: {name}, UID: {uid}, Role: {"Admin" if role == 1 else "Employee"}\n")
+        print("\nUser details:\n", f"Name: {name}, UID: {uid}, Role: {'Admin' if role == 1 else 'Employee'}\n")
         self.user_details = [name, uid, role]
         # check for integrity and add the data to database
         success, message = database.add_user(self.user_details[0], self.user_details[1], self.user_details[2], db_path=DATABASE_PATH)
