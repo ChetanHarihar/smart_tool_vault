@@ -79,6 +79,12 @@ def get_category_id_by_name(category_name, db_path):
         conn.close()
 
 def fetch_all_items(categories, db_path):
+
+    def parse_size(size_str):
+        # Generalized function to extract the first number for sorting
+        numbers = re.findall(r"[\d\.]+", size_str)
+        return float(numbers[0]) if numbers else 0
+
     conn = None
     try:
         conn = sqlite3.connect(db_path)
@@ -88,14 +94,18 @@ def fetch_all_items(categories, db_path):
 
         for category in categories:
             cursor.execute('''
-                            SELECT Item.id AS ItemID, category.name AS CategoryName, item.item_size AS ItemSize, item.quantity AS Quantity
+                            SELECT item.id AS ItemID, category.name AS CategoryName, item.item_size AS ItemSize, item.quantity AS Quantity
                             FROM item
                             INNER JOIN category ON item.category_id = category.id
                             WHERE category.name = ?
                 ''', (category,))
             
             items = cursor.fetchall()
-            all_items[category] = items
+            
+            # Sort items using a generalized numeric extraction function
+            sorted_items = sorted(items, key=lambda x: parse_size(x[2]))
+
+            all_items[category] = sorted_items
 
         return all_items
 
@@ -186,19 +196,21 @@ def update_item_quantity(item_id, subtract_amount, db_path):
         if conn:
             conn.close()
 
-def get_user_details(db_path):
+def get_user_details(db_path, sort_column="name"):
     conn = None
     try:
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
 
-        cursor.execute("SELECT * FROM user")
+        # Modify the query to sort alphabetically by the specified column
+        query = f"SELECT * FROM user ORDER BY {sort_column} ASC"
+        cursor.execute(query)
         users = cursor.fetchall()
 
         return users
 
     except sqlite3.Error as e:
-        print("Error fetching users details:", e)
+        print("Error fetching user details:", e)
         return []
 
     finally:
