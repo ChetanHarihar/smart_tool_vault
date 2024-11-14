@@ -112,6 +112,10 @@ class AdminPanel(tk.Frame):
         # ----- Inventory Management page -----
         self.inv_man_frame = InventoryManagement(self.page_container)
 
+        # configure the dropdown
+        self.inv_man_frame.show_item_cat_var.set(self.category_data[0])  # Set the default option
+        self.inv_man_frame.show_item_cat_dropdown.config(textvariable=self.inv_man_frame.show_item_cat_var, values=self.category_data)
+
         # Configure button commands
         self.inv_man_frame.cat_add_btn.config(command=self.add_category)
         self.inv_man_frame.item_add_btn.config(command=self.add_item)
@@ -472,7 +476,7 @@ class AdminPanel(tk.Frame):
                 self.user_treeview.insert("", "end", values=(f"{item[0]}", f"{item[1]}", f"{item[2]}", f"{'Admin 'if item[3] == 1 else 'Employee'}"), tags=('oddrow',))
 
     def add_user(self):
-        name = self.user_man_frame.name_entry.get().capitalize()
+        name = self.user_man_frame.name_entry.get().upper().strip()
         uid = self.user_man_frame.uid_entry.get()
         role = self.user_man_frame.role_var.get()
         print("\nUser details:\n", f"Name: {name}, UID: {uid}, Role: {'Admin' if role == 1 else 'Employee'}\n")
@@ -520,6 +524,7 @@ class AdminPanel(tk.Frame):
                 if success:
                     msgbox.show_success_message_box(message)
                     self.category_data = database.fetch_categories(db_path=DATABASE_PATH)
+                    self.inv_man_frame.show_item_cat_dropdown.config(textvariable=self.inv_man_frame.show_item_cat_var, values=self.category_data)
                     self.item_view_category_dropdown.config(textvariable=self.item_view_var, values=self.category_data)
                     self.stock_view_category_dropdown.config(textvariable=self.stock_view_var, values=self.category_data)
                     # show the updated list
@@ -548,6 +553,7 @@ class AdminPanel(tk.Frame):
                     return
                 self.category_data = database.fetch_categories(db_path=DATABASE_PATH)
                 self.item_view_category_dropdown.config(textvariable=self.item_view_var, values=self.category_data)
+                self.inv_man_frame.show_item_cat_dropdown.config(textvariable=self.inv_man_frame.show_item_cat_var, values=self.category_data)
                 self.stock_view_category_dropdown.config(textvariable=self.stock_view_var, values=self.category_data)
                 # show the updated list
                 self.show_categories()
@@ -567,10 +573,9 @@ class AdminPanel(tk.Frame):
                 self.item_treeview.insert("", "end", values=(f"{item[0]}", f"{i}", f"{item[2]}"), tags=('oddrow',))
 
     def add_item(self):
-        cat_name = self.inv_man_frame.cat_item_entry.get().strip().upper()
+        cat_name = self.inv_man_frame.show_item_cat_dropdown.get()
         cat_id = database.get_category_id_by_name(cat_name, db_path=DATABASE_PATH)
-        print(cat_id)
-        item_name = self.inv_man_frame.item_entry.get()
+        item_name = self.inv_man_frame.item_entry.get().upper().strip()
         if cat_id is not None:
             if item_name:
                 success, message = database.add_item(cat_id, item_name, db_path=DATABASE_PATH)
@@ -581,7 +586,6 @@ class AdminPanel(tk.Frame):
                     self.show_items()
                     self.show_stock()
                     self.show_unplaced_items()
-                    self.inv_man_frame.cat_item_entry.delete(0, tk.END)
                     self.inv_man_frame.item_entry.delete(0, tk.END)
                 else:
                     msgbox.show_error_message_box("Error", message)
