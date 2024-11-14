@@ -43,7 +43,9 @@ def fetch_categories(db_path):
         
         categories = cursor.fetchall()
         category_names = [category[0] for category in categories]
-        return category_names
+        
+        # Sort category names alphabetically
+        return sorted(category_names)
 
     except sqlite3.Error as e:
         print("SQLite error:", e)
@@ -756,11 +758,12 @@ def get_all_machines(db_path):
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         
-        cursor.execute('SELECT id, name, code FROM machine')
+        # Use ORDER BY name ASC to sort machines alphabetically by name
+        cursor.execute('SELECT id, name, code FROM machine ORDER BY name ASC')
         machines = cursor.fetchall()
         
         return machines
-    
+
     except sqlite3.Error as e:
         print(f"Database error occurred: {e}")
         return []
