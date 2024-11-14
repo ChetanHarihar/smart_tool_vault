@@ -115,8 +115,10 @@ class InventoryManagement(tk.Frame):
 
         tk.Label(add_item_widget_frame, text="Category Name:").grid(row=0,column=0,sticky='w')
 
-        self.cat_item_entry = tk.Entry(add_item_widget_frame, width=30)
-        self.cat_item_entry.grid(row=0,column=1, pady=(5))
+        self.show_item_cat_var = tk.StringVar(add_item_widget_frame)
+
+        self.show_item_cat_dropdown = ttk.Combobox(add_item_widget_frame)
+        self.show_item_cat_dropdown.grid(row=0,column=1, pady=(5))
 
         tk.Label(add_item_widget_frame, text="Item Name:").grid(row=1,column=0,sticky='w')
 
